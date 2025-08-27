@@ -1,33 +1,63 @@
-import { type FormEvent } from 'react'
+import { useRef, useState, type FormEvent, type ChangeEvent } from 'react'
+import type { Form } from './FormWithState'
 
 function FormDataComponent() {
 
+    const formRef = useRef(null)
+
+    const [form, setForm] = useState<Form>({
+        name: '',
+        email: '',
+        phone: '',
+    })
+
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (!form.name || !form.email || !form.phone) return
+        if (formRef.current) {
+            const formData = new FormData(formRef.current)
+            const redColor = Boolean(formData.get('red'))
+            const blueColor = Boolean(formData.get('blue'))
+            console.log({
+                ...form,
+                redColor,
+                blueColor
+            })
+        }
     };
 
+    const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => setForm({
+        ...form,
+        [e.target.name]: e.target.value
+    })
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto p-[50px] text-white">
+        <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto p-[50px] text-white">
             <input
                 type="text"
                 placeholder="Nombre"
                 name="name"
                 className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 placeholder-gray-500 shadow-sm hover:shadow-md"
+                value={form.name}
+                onChange={handleOnChange}
             />
             <input
                 type="email"
                 placeholder="Email"
                 name="email"
                 className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-300  placeholder-gray-500 shadow-sm hover:shadow-md"
+                value={form.email}
+                onChange={handleOnChange}
             />
             <input
                 type="tel"
                 placeholder="Teléfono"
-                name="telephone"
+                name="phone"
+                value={form.phone}
+                onChange={handleOnChange}
                 className="w-full px-4 py-3 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-300 placeholder-gray-500 shadow-sm hover:shadow-md"
             />
-             <div className="flex items-center">
+            <div className="flex items-center">
                 <input
                     type="checkbox"
                     id="red"
